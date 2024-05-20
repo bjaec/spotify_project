@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Analysis - Analyze All Songs</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Analyze All Songs</h1>
+        <form id="analysis-form">
+            <div>
+                <label for="num-songs">Number of songs to analyze:</label>
+                <input type="number" id="num-songs" name="num-songs" min="1" max="50" required>
+            </div>
+            <div>
+                <label for="time-range">Time range:</label>
+                <select id="time-range" name="time-range" required>
+                    <option value="short_term">Last 4 weeks</option>
+                    <option value="medium_term">Last 6 months</option>
+                    <option value="long_term">All time</option>
+                </select>
+            </div>
+            <div>
+                <label for="audio-features">Audio features to analyze:</label>
+                <select id="audio-features" name="audio-features" multiple required>
+                    <option value="acousticness">Acousticness</option>
+                    <option value="danceability">Danceability</option>
+                    <option value="energy">Energy</option>
+                    <option value="instrumentalness">Instrumentalness</option>
+                    <option value="liveness">Liveness</option>
+                    <option value="loudness">Loudness</option>
+                    <option value="mode">Mode</option>
+                    <option value="speechiness">Speechiness</option>
+                    <option value="tempo">Tempo</option>
+                    <option value="valence">Valence</option>
+                </select>
+            </div>
+            <button type="submit">Analyze</button>
+        </form>
+        <div id="results"></div>
+    </div>
+    <script>
+        document.getElementById('analysis-form').onsubmit = function(event) {
+            event.preventDefault();
+            const numSongs = document.getElementById('num-songs').value;
+            const timeRange = document.getElementById('time-range').value;
+            const audioFeatures = Array.from(document.getElementById('audio-features').selectedOptions).map(option => option.value);
+
+            // Perform the analysis using the values
+            // For now, we will just display them as a placeholder
+            document.getElementById('results').innerHTML = `<p>Analyzing top ${numSongs} songs from the ${timeRange.replace('_', ' ')} range with features: ${audioFeatures.join(', ')}...</p>`;
+        };
+    </script>
+</body>
+</html>
