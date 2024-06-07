@@ -19,6 +19,8 @@ client_secret = os.getenv("CLIENT_SECRET")
 redirect_uri = "http://localhost:8888/callback"
 token = os.getenv("TOKEN")
 
+
+
 def create_auth_url():
     scope = "playlist-read-private playlist-modify-private playlist-modify-public user-library-read user-library-modify"
     auth_url = f"https://accounts.spotify.com/authorize?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}&scope={scope.replace(' ', '%20')}&show_dialog=true"
@@ -118,8 +120,8 @@ def remove_tracks_in_batches(token, track_ids, batch_size=50):
     return True
 
 #below is code to start the server to attain access to spotify account 
-# webbrowser.open(create_auth_url())
-# app.run(port=8888, debug=True)
+webbrowser.open(create_auth_url())
+app.run(port=8888, debug=True)
 
 playlists = fetch_all_user_playlists(token)
 

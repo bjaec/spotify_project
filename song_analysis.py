@@ -1,5 +1,6 @@
 import spotipy 
 from spotipy.oauth2 import SpotifyOAuth
+from dotenv import load_dotenv
 #allows us to retrieve credentials just once (instead of everytime)
 import streamlit as st
 #using streamlit for a more aesthetic UI than just jupyter notebook
@@ -8,7 +9,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 
+load_dotenv()
+
 client_id = os.getenv("CLIENT_ID")
+
 client_secret = os.getenv("CLIENT_SECRET")
 redirect_url = "http://localhost:8888/callback"
 
@@ -136,7 +140,7 @@ playlist_audio_features = sp.audio_features(playlist_track_ids)
 df_playlist = pd.DataFrame(playlist_audio_features)
 df_playlist['track_name'] = [item['track']['name'] for item in playlist_tracks['items']]
 
-df_playlist = df_playlist[['track_name','loudness']]
+df_playlist = df_playlist[['track_name','danceability', 'energy', 'valence', 'acousticness']]
 df_playlist.set_index('track_name', inplace=True)
 
 st.subheader('Audio Features for Playlist "3 am mood music"')

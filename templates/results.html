@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Analysis Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #000;
+            color: white;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+        }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+</head>
+<body>
+    <div class="container">
+        <div id="results">
+            {{ tables|safe }}
+        </div>
+        <div>
+            <div id="chart"></div>
+        </div>
+    </div>
+    <script>
+        var graphJSON = {{ graphJSON | safe }};
+        Plotly.newPlot('chart', graphJSON.data, graphJSON.layout);
+    </script>
+</body>
+</html>

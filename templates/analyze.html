@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #000;
+            color: white;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+        }
+        .emoji-right {
+            font-size: 1.5em; /* Scale the emoji size */
+            margin-left: 10px; /* Space between title and emoji */
+            vertical-align: middle; /* Align emoji with text */
+        }
+        .btn {
+            background-color: #1db954;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            border: none;
+        }
+        .btn:hover {
+            background-color: #14833b;
+        }
+        input, select {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Analyze Your Top Tracks <span class="emoji-right">🕺</span></h1>
+        <form action="{{ url_for('analyze') }}" method="POST" id="analyze-form">
+            <div>
+                <label for="num_songs">Number of Songs:</label>
+                <input type="number" id="num_songs" name="num_songs" min="1" max="50" value="10" required>
+            </div>
+            <div>
+                <label for="time_range">Time Range:</label>
+                <select id="time_range" name="time_range">
+                    <option value="short_term">Short Term</option>
+                    <option value="medium_term">Medium Term</option>
+                    <option value="long_term">Long Term</option>
+                </select>
+            </div>
+            <div>
+                <label for="audio_features">Audio Features (hold command to select multiple):</label>
+                <select id="audio_features" name="audio_features" multiple>
+                    <option value="danceability">Danceability</option>
+                    <option value="energy">Energy</option>
+                    <option value="key">Key</option>
+                    <option value="loudness">Loudness</option>
+                    <option value="mode">Mode</option>
+                    <option value="speechiness">Speechiness</option>
+                    <option value="acousticness">Acousticness</option>
+                    <option value="instrumentalness">Instrumentalness</option>
+                    <option value="liveness">Liveness</option>
+                    <option value="valence">Valence</option>
+                    <option value="tempo">Tempo</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Analyze</button>
+        </form>
+        <div id="results"></div>
+    </div>
+</body>
+</html>
