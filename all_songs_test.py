@@ -65,6 +65,8 @@ def analyze():
     for trace in fig.data:
         trace.hovertemplate = '<b>Audio Feature</b>: %{x}<br><b>Percentage</b>: %{y:.2f}%<extra></extra>'
         trace.name = trace.name.split("=")[-1]  # Update trace name to be the audio feature name
+
+    TEST
     
     # Update the layout to set background color and text color
     fig.update_layout(
