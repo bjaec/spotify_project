@@ -15,26 +15,30 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            text-align: center;
         }
         .container {
-            max-width: 800px;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black;
+        }
+        #chart {
+            width: 100%;
+            height: 100%;
         }
     </style>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <div id="results">
-            {{ tables|safe }}
-        </div>
-        <div>
-            <div id="chart"></div>
-        </div>
+        <div id="chart"></div>
     </div>
     <script>
-        var graphJSON = {{ graphJSON | safe }};
-        Plotly.newPlot('chart', graphJSON.data, graphJSON.layout);
+        var graphJSON = {{ graphJSON | tojson }};
+        var graphData = JSON.parse(graphJSON);
+        Plotly.newPlot('chart', graphData.data, graphData.layout, {responsive: true});
     </script>
 </body>
 </html>

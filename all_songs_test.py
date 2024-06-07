@@ -6,7 +6,7 @@ import pandas as pd
 import os
 #use plotly instead because more aesthetic version of matplotlib 
 import plotly.express as px
-import plotly.utils
+import plotly.graph_objects as go
 import json
 
 app = Flask(__name__)
@@ -52,24 +52,37 @@ def analyze():
     features = sp.audio_features(track_ids)
 
     df = pd.DataFrame(features)
-    df['Song Title'] = [track['name'] for track in top_tracks['items']]
+    df['Song Title'] = [f"{rank+1}. {track['name']}" for rank, track in enumerate(top_tracks['items'])]
     df = df[['Song Title'] + audio_features]
     df.set_index('Song Title', inplace=True)
 
     df = df * 100 
 
-    fig = px.bar(df, x=df.index, y=audio_features, barmode='group', title="Your Top Tracks' Vibes 🎧",
-                 labels={"value": "Percentage", "variable": "Audio Feature", "index": "Song Title"})
-    
-    # Customize hover information
-    for trace in fig.data:
-        trace.hovertemplate = '<b>Audio Feature</b>: %{x}<br><b>Percentage</b>: %{y:.2f}%<extra></extra>'
-        trace.name = trace.name.split("=")[-1]  # Update trace name to be the audio feature name
+    # Create figure
+    fig = go.Figure()
 
-    TEST
-    
-    # Update the layout to set background color and text color
+   # Define pastel colors for specific features
+    feature_colors = {
+        'energy':'#FFD700',  # Darker pastel yellow (Gold)
+        'danceability': '#E57373',   # Darker pastel red
+        'default': '#B0E0E6'  # Light pastel blue for others
+    }
+
+
+    # Add traces for each audio feature
+    for feature in audio_features:
+        color = feature_colors.get(feature, feature_colors['default'])
+        fig.add_trace(go.Bar(
+            x=df.index,
+            y=df[feature],
+            name=feature.capitalize(),
+            marker_color=color,
+            hovertemplate=f'<b>Audio Feature</b>: {feature.capitalize()}<br><b>Song Title</b>: %{{x}}<br><b>{feature.capitalize()} Percentage</b>: %{{y:.2f}}%<extra></extra>'
+        ))
+
+
     fig.update_layout(
+        title="Your Top Tracks' Vibes 🎧",
         plot_bgcolor='black',
         paper_bgcolor='black',
         font=dict(
@@ -79,12 +92,14 @@ def analyze():
         ),
         xaxis=dict(showgrid=False, zeroline=False, title='Song Title'),
         yaxis=dict(showgrid=False, zeroline=False, title='Percentage (%)'),
+        barmode='group',
         autosize=True,
-        height=800,  # Adjust this as needed
-        colorway=['#FFDDC1', '#FFABAB', '#FFC3A0', '#FF677D', '#D4A5A5', '#392F5A', '#31A2AC', '#61C0BF']
+        margin=dict(l=40, r=40, t=60, b=40),
+        height=700,
+        width=1200
     )
 
-    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    graphJSON = fig.to_json()
 
     return render_template('results.html', graphJSON=graphJSON)
     

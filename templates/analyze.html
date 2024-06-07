@@ -46,6 +46,11 @@
             width: 100%;
             margin-bottom: 10px;
         }
+        .disclaimer {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -54,10 +59,12 @@
         <form action="{{ url_for('analyze') }}" method="POST" id="analyze-form">
             <div>
                 <label for="num_songs">Number of Songs:</label>
+                <div class="disclaimer">* Number of songs must be between 1 and 50. Spotify API caps at 50. </div>
                 <input type="number" id="num_songs" name="num_songs" min="1" max="50" value="10" required>
             </div>
             <div>
                 <label for="time_range">Time Range:</label>
+                <div class="disclaimer">* Short Term: Last 4 Weeks, Medium Term: Last 6 Months, Long Term: All Time.</div>
                 <select id="time_range" name="time_range">
                     <option value="short_term">Short Term</option>
                     <option value="medium_term">Medium Term</option>
