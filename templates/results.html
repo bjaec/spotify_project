@@ -4,41 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify Analysis Results</title>
+    <!-- Import Poppins font from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #000;
             color: white;
-            height: 100vh;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
+            padding: 20px;
         }
         .container {
             width: 90%;
-            height: 90%;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: space-between;
+            align-items: flex-start;
             background-color: black;
+            flex-wrap: wrap;
         }
-        #chart {
-            width: 100%;
-            height: 100%;
+        #bar-chart {
+            flex: 3;
+            margin-right: 20px;
+        }
+        .pie-charts {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;  /* Add space between bar chart and pie charts */
+        }
+        .pie-chart {
+            margin-bottom: 20px;
+        }
+        .message {
+            text-align: center;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            margin-bottom: 20px;
         }
     </style>
+    <!-- Import Plotly.js library -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
+    <h1>Spotify Analysis Results</h1>
     <div class="container">
-        <div id="chart"></div>
+        <!-- Container for the bar chart -->
+        <div id="bar-chart"></div>
+        <!-- Container for pie charts and messages -->
+        <div class="pie-charts">
+            {% for pie_chart, message in zip(pie_charts, fun_messages) %}
+                <div id="pie-chart-{{ loop.index }}" class="pie-chart"></div>
+                <div class="message">{{ message }}</div>
+                <script type="text/javascript">
+                    var pieChartData = {{ pie_chart|safe }};
+                    Plotly.newPlot('pie-chart-{{ loop.index }}', pieChartData.data, pieChartData.layout, {responsive: true});
+                </script>
+            {% endfor %}
+        </div>
     </div>
-    <script>
+    <script type="text/javascript">
+        // Parse the JSON-encoded Plotly figure for the bar chart
         var graphJSON = {{ graphJSON | tojson }};
         var graphData = JSON.parse(graphJSON);
-        Plotly.newPlot('chart', graphData.data, graphData.layout, {responsive: true});
+        // Render the bar chart using Plotly
+        Plotly.newPlot('bar-chart', graphData.data, graphData.layout, {responsive: true});
     </script>
 </body>
 </html>

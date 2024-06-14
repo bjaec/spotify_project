@@ -29,6 +29,11 @@ sp = spotipy.Spotify(
     )
 )
 
+# Custom context processor to add zip to Jinja2 context
+@app.context_processor
+def utility_processor():
+    return dict(zip=zip)
+
 #home page
 @app.route('/')
 def home():
@@ -104,6 +109,9 @@ def handle_percentage_features(df, percentage_features):
         'valence': '#138D75',  # Light pastel green
     }
 
+    pie_charts = []
+    fun_messages = []
+
     for feature in percentage_features:
         color = feature_colors[feature]
         fig.add_trace(go.Bar(
@@ -113,6 +121,15 @@ def handle_percentage_features(df, percentage_features):
             marker_color=color,
             hovertemplate=f'<b>Audio Feature</b>: {feature.capitalize()}<br><b>Song Title</b>: %{{x}}<br><b>{feature.capitalize()} Percentage</b>: %{{y:.2f}}%<extra></extra>'
         ))
+
+        # Create pie chart for the feature
+        avg_value = df[feature].mean()
+        pie_fig = create_pie_chart(feature, avg_value, feature_colors)
+        pie_charts.append(pie_fig.to_json())
+
+        # Generate fun message based on thresholds
+        message = generate_fun_message(feature, avg_value)
+        fun_messages.append(message)
 
     fig.update_layout(
         title="Your Top Tracks' Vibes 🎧",
@@ -140,7 +157,79 @@ def handle_percentage_features(df, percentage_features):
     #also Frontend Integration: By converting the figure to JSON, you can include the serialized figure data in your HTML template.
     # On the client side (in the browser), JavaScript can parse the JSON and render the Plotly chart.
 
-    return render_template('results.html', graphJSON=graphJSON, feature_descriptions=feature_descriptions)
+    return render_template('results.html', graphJSON=graphJSON, pie_charts=pie_charts, fun_messages=fun_messages, feature_descriptions=feature_descriptions)
+
+def create_pie_chart(feature, avg_value, feature_colors):
+    """
+    Create a pie chart for the given feature and average value.
+    """
+    labels = ['Average', 'Remainder']
+    values = [avg_value, 100 - avg_value]
+    color = feature_colors.get(feature)  
+
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors=[color, '#000000']))])  # '#17202A' is for the remainder
+
+    fig.update_layout(
+        title=f'{feature.capitalize()} Average:',
+        showlegend=False,
+        annotations=[dict(text=f'{avg_value:.1f}%', x=0.5, y=0.5, 
+                    font_size=50, font_color='white', showarrow=False, font=dict(color='white', 
+                    size=80, family="Poppins, sans-serif"))],
+        margin=dict(l=20, r=20, t=30, b=20),
+        paper_bgcolor='black',
+        plot_bgcolor='black',
+        font=dict(color='white', family="Poppins, sans-serif")
+    )
+    return fig
+
+def generate_fun_message(feature, avg_value):
+    """
+    Generate a fun message based on the average value of the feature.
+    """
+    if feature == 'danceability':
+        if avg_value > 70:
+            return "You be bopping!"
+        elif avg_value < 30:
+            return "This shit not really that kind of a bop I see."
+        else:
+            return "It's got some groove."
+    elif feature == 'energy':
+        if avg_value > 70:
+            return "High energy vibes!"
+        elif avg_value < 30:
+            return "Chill and mellow."
+        else:
+            return "A balanced energy mix."
+    elif feature == 'speechiness':
+        if avg_value > 70:
+            return "A lot of talking here!"
+        elif avg_value < 30:
+            return "You listening to classical?"
+        else:
+            return "A good mix of speech and music. Like when I talk frfr."
+    elif feature == 'acousticness':
+        if avg_value > 70:
+            return "Very acoustic, earthy vibes!"
+        elif avg_value < 30:
+            return "Not very acoustic."
+        else:
+            return "Some acoustic elements."
+    elif feature == 'instrumentalness':
+        if avg_value > 70:
+            return "Mostly instrumental tracks!"
+        elif avg_value < 30:
+            return "Lots of vocals here."
+        else:
+            return "A good mix of instrumentals and vocals."
+    elif feature == 'valence':
+        if avg_value > 70:
+            return "Happy and cheerful tunes!"
+        elif avg_value < 30:
+            return "Quite somber and serious."
+        else:
+            return "A mix of happy and sad."
+    # Add more messages for other features if needed
+    return ""
 
 def handle_individual_feature(df, individual_feature):
     """
