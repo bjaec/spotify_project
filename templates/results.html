@@ -15,19 +15,18 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            text-align: center;
         }
         .container {
-            max-width: 1000px; /* Adjust width as needed */
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black;
         }
-        .tooltip {
-            position: absolute;
-            background-color: #555;
-            color: white;
-            border-radius: 5px;
-            padding: 10px;
-            z-index: 1000;
-            display: none;
+        #chart {
+            width: 100%;
+            height: 100%;
         }
     </style>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -35,29 +34,11 @@
 <body>
     <div class="container">
         <div id="chart"></div>
-        <div id="tooltip" class="tooltip"></div>
     </div>
     <script>
-        var graphJSON = {{ graphJSON | safe }};
-        var featureDescriptions = {{ feature_descriptions | tojson }};
-
-        Plotly.newPlot('chart', graphJSON.data, graphJSON.layout);
-
-        const tooltip = document.getElementById('tooltip');
-
-        document.getElementById('chart').on('plotly_legendhover', function(data) {
-            const feature = data.points[0].fullData.name;
-            const description = featureDescriptions[feature] || 'No description available';
-
-            tooltip.innerHTML = `<strong>${feature}</strong><br>${description}`;
-            tooltip.style.display = 'block';
-            tooltip.style.left = `${data.event.clientX + 15}px`;
-            tooltip.style.top = `${data.event.clientY + 15}px`;
-        });
-
-        document.getElementById('chart').on('plotly_legendout', function(data) {
-            tooltip.style.display = 'none';
-        });
+        var graphJSON = {{ graphJSON | tojson }};
+        var graphData = JSON.parse(graphJSON);
+        Plotly.newPlot('chart', graphData.data, graphData.layout, {responsive: true});
     </script>
 </body>
 </html>
