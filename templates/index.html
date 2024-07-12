@@ -43,12 +43,15 @@
     </style>
 </head>
 <body>
+
     <div class="container">
         <h1>Spotify Music Analysis Dashboard</h1>
         <div class="emojis">🎧📊</div>
         <div class="options">
             <a href="{{ url_for('analyze_page') }}" class="btn">All Songs</a>
+            <a href="{{ url_for('remove_duplicates') }}" class="btn">Clean Duplicates</a> 
         </div>
     </div>
+
 </body>
 </html>

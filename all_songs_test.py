@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth #to implement OAuth (allows me to just access for permission once)
 
+from requests import post, get, delete  # Add this line
+
 import pandas as pd #for dataframes
 #use plotly instead because more aesthetic version of matplotlib 
 import plotly.express as px
@@ -188,9 +190,9 @@ def generate_fun_message(feature, avg_value):
     """
     if feature == 'danceability':
         if avg_value > 70:
-            return "You be bopping!"
+            return "very energetic and upbeat playlist!"
         elif avg_value < 30:
-            return "This shit not really that kind of a bop I see."
+            return "not very energetic"
         else:
             return "It's got some groove."
     elif feature == 'energy':
@@ -204,14 +206,14 @@ def generate_fun_message(feature, avg_value):
         if avg_value > 70:
             return "A lot of talking here!"
         elif avg_value < 30:
-            return "You listening to classical?"
+            return "Is this classical?"
         else:
             return "A good mix of speech and music. Like when I talk frfr."
     elif feature == 'acousticness':
         if avg_value > 70:
             return "Very acoustic, earthy vibes!"
         elif avg_value < 30:
-            return "Not very acoustic."
+            return "Not much acoustic type shit."
         else:
             return "Some acoustic elements."
     elif feature == 'instrumentalness':
@@ -267,6 +269,108 @@ def handle_individual_feature(df, individual_feature):
 
     graphJSON = fig.to_json()
     return render_template('results.html', graphJSON=graphJSON)
+
+@app.route('/remove-duplicates')
+def remove_duplicates():
+    return render_template('remove_duplicates_loading.html')
+
+@app.route('/process-remove-duplicates', methods=['POST'])
+def process_remove_duplicates():
+    playlists = fetch_all_user_playlists()
+    duplicate_details_by_playlist = {}
+
+    for playlist in playlists:
+        tracks = fetch_tracks_from_playlist(playlist['id'])
+        duplicate_ids, duplicate_details = identify_duplicates(tracks)
+
+        if duplicate_ids:
+            remove_tracks_from_playlist(playlist['id'], duplicate_ids)
+            duplicate_details_by_playlist[playlist['name']] = duplicate_details
+
+    # Remove duplicates from liked songs
+    tracks = fetch_all_saved_tracks()
+    duplicate_ids, duplicate_details = identify_duplicates(tracks)
+
+    if duplicate_ids:
+        remove_tracks_in_batches(duplicate_ids)
+        duplicate_details_by_playlist["Liked Songs"] = duplicate_details
+
+    return render_template('remove_duplicates_results.html', duplicate_details_by_playlist=duplicate_details_by_playlist)
+
+def fetch_all_saved_tracks():
+    url = "https://api.spotify.com/v1/me/tracks"
+    headers = {"Authorization": "Bearer " + sp.auth_manager.get_access_token(as_dict=False)}
+    all_tracks = []
+    while url:
+        response = get(url, headers=headers)
+        json_response = response.json()
+        all_tracks.extend(json_response['items'])
+        url = json_response.get('next')
+    return all_tracks
+
+def fetch_all_user_playlists():
+    url = "https://api.spotify.com/v1/me/playlists"
+    headers = {"Authorization": "Bearer " + sp.auth_manager.get_access_token(as_dict=False)}
+    playlists = []
+    while url:
+        response = get(url, headers=headers)
+        data = response.json()
+        playlists.extend(data['items'])
+        url = data.get('next')
+    return playlists
+
+def fetch_tracks_from_playlist(playlist_id):
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+    headers = {"Authorization": "Bearer " + sp.auth_manager.get_access_token(as_dict=False)}
+    tracks = []
+    while url:
+        response = get(url, headers=headers)
+        data = response.json()
+        tracks.extend(data['items'])
+        url = data.get('next')
+    return tracks
+
+def identify_duplicates(tracks):
+    unique_tracks = {}
+    duplicates = []
+    duplicate_details = []
+
+    for item in tracks:
+        track = item['track']
+        track_id = track['id']
+        artist_name = track['artists'][0]['name']
+        track_name = track['name']
+        track_key = (artist_name.lower(), track_name.lower())
+
+        if track_key in unique_tracks:
+            duplicates.append(track_id)
+            duplicate_details.append((track_name, artist_name))
+        else:
+            unique_tracks[track_key] = track_id
+
+    return duplicates, duplicate_details
+
+def remove_tracks_in_batches(track_ids, batch_size=50):
+    url = "https://api.spotify.com/v1/me/tracks"
+    headers = {"Authorization": "Bearer " + sp.auth_manager.get_access_token(as_dict=False)}
+    batches = [track_ids[i:i + batch_size] for i in range(0, len(track_ids), batch_size)]
+    for batch in batches:
+        data = json.dumps({"ids": batch})
+        response = delete(url, headers=headers, data=data)
+        if response.status_code not in [200, 202]:
+            return False
+    return True
+
+def remove_tracks_from_playlist(playlist_id, track_ids, batch_size=50):
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+    headers = {"Authorization": "Bearer " + sp.auth_manager.get_access_token(as_dict=False)}
+    batches = [track_ids[i:i + batch_size] for i in range(0, len(track_ids), batch_size)]
+    for batch in batches:
+        data = json.dumps({"tracks": [{"uri": f"spotify:track:{track_id}"} for track_id in batch]})
+        response = delete(url, headers=headers, data=data)
+        if response.status_code not in [200, 202]:
+            return False
+    return True
 
 if __name__ == '__main__':
     app.run(debug=True, port=8888)
