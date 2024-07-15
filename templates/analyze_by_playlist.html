@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyze Playlist</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Analyze by Playlist <span class="emoji-right">🕺</span> </h1>
+        <form action="{{ url_for('analyze_playlist_songs') }}" method="post">
+
+            <div>
+                <label for="playlist_id">Select Playlist:</label>
+                <select id="playlist_id" name="playlist_id">
+                    {% for playlist in playlists %}
+                        <option value="{{ playlist.id }}">{{ playlist.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="num_songs">Number of Songs:</label>
+                <div class="disclaimer">* Number of songs must be between 1 and 50. Spotify API can retrieve max 50 songs per request.</div>
+                <input type="number" id="num_songs" name="num_songs" min="1" max="50" value="10" required>
+            </div>
+
+            <div class="tooltip">
+                <label for="percentage_features">Percentage Features (hold command to select multiple):</label>
+                <div class="disclaimer">* Select multiple percentage features to analyze.</div>
+                <select id="percentage_features" name="percentage_features" multiple>
+                    <option value="danceability">Danceability</option>
+                    <option value="energy">Energy</option>
+                    <option value="speechiness">Speechiness</option>
+                    <option value="acousticness">Acousticness</option>
+                    <option value="instrumentalness">Instrumentalness</option>
+                    <option value="valence">Valence</option>
+                </select>
+            </div>
+
+            <div class="tooltip">
+                <label for="individual_features">Individual Features:</label>
+                <select id="individual_features" name="individual_features">
+                    <option value="key">Key</option>
+                    <option value="mode">Mode</option>
+                    <option value="time_signature">Time Signature</option>
+                    <option value="loudness">Loudness</option>
+                    <option value="tempo">Tempo</option>
+                </select>
+            </div>
+
+            <div class="disclaimer">* Select one individual feature to analyze.</div>
+
+            <button type="submit" class="btn">Analyze</button>
+
+        </form>
+    </div>
+    <!-- Include the JavaScript file -->
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</body>
+
+</html>

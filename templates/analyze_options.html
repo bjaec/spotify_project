@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyze Options</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Analyze Your Songs</h1>
+        <a href="{{ url_for('analyze_all') }}" class="btn">Analyze All Songs</a>
+        <a href="{{ url_for('analyze_by_playlist') }}" class="btn">Analyze by Playlist</a>
+    </div>
+</body>
+</html>

@@ -132,12 +132,14 @@
 <body>
     <div class="container">
         <h1>Analyze Your Top Tracks <span class="emoji-right">🕺</span></h1>
-        <form action="{{ url_for('analyze') }}" method="POST" id="analyze-form">
+        <form action="{{ url_for('analyze_all_songs') }}" method="POST" id="analyze-form">
+
             <div>
                 <label for="num_songs">Number of Songs:</label>
                 <div class="disclaimer">* Number of songs must be between 1 and 50. Spotify API can retrieve max 50 songs per request.</div>
                 <input type="number" id="num_songs" name="num_songs" min="1" max="50" value="10" required>
             </div>
+
             <div>
                 <label for="time_range">Time Range:</label>
                 <div class="disclaimer">* Short Term: Last 4 Weeks, Medium Term: Last 6 Months, Long Term: All Time.</div>
@@ -147,6 +149,7 @@
                     <option value="long_term">Long Term (All Time)</option>
                 </select>
             </div>
+
             <div class="tooltip">
                 <label for="percentage_features">Percentage Features (hold command to select multiple):</label>
                 <div class="disclaimer">* Select multiple percentage features to analyze.</div>
@@ -159,9 +162,9 @@
                     <option value="valence">Valence</option>
                 </select>
             </div>
+
             <div class="tooltip">
                 <label for="individual_features">Individual Features:</label>
-                
                 <select id="individual_features" name="individual_features">
                     <option value="key">Key</option>
                     <option value="mode">Mode</option>
@@ -170,7 +173,9 @@
                     <option value="tempo">Tempo</option>
                 </select>
             </div>
+
             <div class="disclaimer">* Select one individual feature to analyze.</div>
+            
             <button type="submit" class="btn">Analyze</button>
         </form>
         <div id="results"></div>
