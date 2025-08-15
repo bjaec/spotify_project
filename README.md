@@ -11,3 +11,11 @@ Full-stack project working w/ Spotify API to add desired functionalities
 - music visualization dashboard analyzing features for top songs or a specific playlist 
 - deletes duplicate songs from liked songs and all playlists by uniquely identifying songs through key made up of song title and artist name (addresses issue of duplicate songs 
 belonging to different albums, etc.)
+
+## Demos: 
+Analyzing Music End-to-End Flow: 
+https://app.tango.us/app/workflow/Spotify-Project-User-Flow-4e131387bad548ebbf4b3f4ea60e10bb <br>
+The endpoints for accessing tracks’ audio features were deprecated by Spotify (source: https://developer.spotify.com/documentation/web-api/reference/get-several-audio-features), and I can no longer show the complete working functionality for the chart analyzing the song’s audio features. 
+
+Removing Duplicates End-to-End Flow: 
+https://app.tango.us/app/workflow/Spotify-Project--Removing-Duplicates-8ba49fc0a1964383a545adb0a7c85589 
